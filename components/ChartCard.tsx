@@ -1,24 +1,38 @@
 "use client";
 
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 // Define a generic type for chart data
-interface ChartData {
+export interface ChartData {
   timestamp: string;
-  [key: string]: string | number; // allows flexible fields like rsi or price_in_sol
+  [key: string]: string | number;
 }
 
-interface ChartCardProps {
+// Make ChartCard generic to support RSIData or TradeData
+interface ChartCardProps<T extends ChartData> {
   title: string;
-  data: ChartData[];
-  dataKey: string;
+  data: T[];
+  dataKey: keyof T;
   color: string;
 }
 
-export default function ChartCard({ title, data, dataKey, color }: ChartCardProps) {
+export default function ChartCard<T extends ChartData>({
+  title,
+  data,
+  dataKey,
+  color,
+}: ChartCardProps<T>) {
   return (
     <div className="bg-white shadow-lg rounded-2xl p-5 w-full">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
+
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <XAxis dataKey="timestamp" hide />
@@ -26,7 +40,7 @@ export default function ChartCard({ title, data, dataKey, color }: ChartCardProp
           <Tooltip />
           <Line
             type="monotone"
-            dataKey={dataKey}
+            dataKey={String(dataKey)}
             stroke={color}
             strokeWidth={2}
             dot={false}

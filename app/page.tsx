@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { fetchRSIData, fetchTradesData } from "../services/api";
-import ChartCard from "../components/ChartCard";
+import ChartCard, { ChartData } from "../components/ChartCard";
 
-interface RSIData {
+// Extend from ChartData to satisfy the type constraint
+interface RSIData extends ChartData {
   token_address: string;
   rsi: number;
   timestamp: string;
 }
 
-interface TradeData {
+interface TradeData extends ChartData {
   token_address: string;
   price_in_sol: number;
   timestamp: string;
@@ -28,7 +29,7 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 5000); // refresh every 5 sec
+    const interval = setInterval(loadData, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -38,14 +39,15 @@ export default function Home() {
         📊 Real-Time RSI Dashboard
       </h1>
 
+      {/* Chart Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <ChartCard
+        <ChartCard<RSIData>
           title="RSI Data (last 10)"
           data={rsiData}
           dataKey="rsi"
           color="#2563eb"
         />
-        <ChartCard
+        <ChartCard<TradeData>
           title="Trade Prices (in SOL)"
           data={tradesData}
           dataKey="price_in_sol"
@@ -53,8 +55,10 @@ export default function Home() {
         />
       </div>
 
+      {/* JSON Debug Section */}
       <div className="mt-10 bg-white p-5 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-3 text-gray-700">Raw Data</h2>
+
         <details className="cursor-pointer">
           <summary className="text-blue-600 underline">View RSI JSON</summary>
           <pre className="bg-gray-50 p-3 rounded-lg text-sm overflow-x-auto">
